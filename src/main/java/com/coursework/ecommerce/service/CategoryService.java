@@ -1,34 +1,48 @@
 package com.coursework.ecommerce.service;
 
-import com.coursework.ecommerce.model.Category;
-import com.coursework.ecommerce.repository.CategoryRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.coursework.ecommerce.model.Category;
+import com.coursework.ecommerce.repository.CategoryRepo;
 
 @Service
+@Transactional
 public class CategoryService {
-    @Autowired
-    CategoryRepo categoryRepo;
+
+    private final CategoryRepo categoryrepository;
+
+    public CategoryService(CategoryRepo categoryrepository) {
+        this.categoryrepository = categoryrepository;
+    }
+
+    public List<Category> listCategories() {
+        return categoryrepository.findAll();
+    }
 
     public void createCategory(Category category) {
-        categoryRepo.save(category);
+        categoryrepository.save(category);
     }
 
-    public List<Category> listCategory() {
-        return categoryRepo.findAll();
+    public Category readCategory(String categoryName) {
+        return categoryrepository.findByCategoryName(categoryName);
     }
 
-    public void editCategory(int categoryId, Category updateCategory) {
-        Category category = categoryRepo.getById(categoryId);
-        category.setCategoryName(updateCategory.getCategoryName());
-        category.setDescription(updateCategory.getDescription());
-        category.setImageUrl(updateCategory.getImageUrl());
-        categoryRepo.save(category);
+    public Optional<Category> readCategory(Integer categoryId) {
+        return categoryrepository.findById(categoryId);
     }
 
-    public boolean findById(int categoryId) {
-        return categoryRepo.findById(categoryId).isPresent();
+    public void updateCategory(Integer categoryID, Category newCategory) {
+        Category category = categoryrepository.findById(categoryID).get();
+        category.setCategoryName(newCategory.getCategoryName());
+        category.setDescription(newCategory.getDescription());
+        category.setProducts(newCategory.getProducts());
+        category.setImageUrl(newCategory.getImageUrl());
+
+        categoryrepository.save(category);
     }
 }

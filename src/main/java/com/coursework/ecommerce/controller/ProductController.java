@@ -3,59 +3,55 @@ package com.coursework.ecommerce.controller;
 import com.coursework.ecommerce.common.ApiResponse;
 import com.coursework.ecommerce.dto.ProductDto;
 import com.coursework.ecommerce.model.Category;
-import com.coursework.ecommerce.model.Product;
-import com.coursework.ecommerce.repository.CategoryRepo;
+import com.coursework.ecommerce.service.CategoryService;
 import com.coursework.ecommerce.service.ProductService;
-import io.swagger.annotations.Api;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
 public class ProductController {
+    @Autowired ProductService productService;
     @Autowired
-    ProductService productService;
-
-    @Autowired
-    CategoryRepo categoryRepo;
-
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody ProductDto productDto) {
-        Optional<Category> optionalCategory = categoryRepo.findById(productDto.getCategoryId());
-        if (!optionalCategory.isPresent()) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse(false, "category does not exists"), HttpStatus.BAD_REQUEST);
-        }
-        productService.createProduct(productDto, optionalCategory.get());
-        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "product has been added"), HttpStatus.CREATED);
-    }
+    CategoryService categoryService;
 
     @GetMapping("/")
     public ResponseEntity<List<ProductDto>> getProducts() {
-        List<ProductDto> products = productService.getAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        List<ProductDto> body = productService.listProducts();
+        return new ResponseEntity<List<ProductDto>>(body, HttpStatus.OK);
     }
 
-    // create an api to edit the product
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String query) {
+        List<ProductDto> searchResults = productService.searchProducts(query);
+        return new ResponseEntity<>(searchResults, HttpStatus.OK);
+    }
 
-
-    @PostMapping("/update/{productId}")
-    public ResponseEntity<ApiResponse> updateProduct(@PathVariable("productId") Integer productId, @RequestBody ProductDto productDto) throws Exception {
-        Optional<Category> optionalCategory = categoryRepo.findById(productDto.getCategoryId());
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addProduct(@RequestBody ProductDto productDto) {
+        Optional<Category> optionalCategory = categoryService.readCategory(productDto.getCategoryId());
         if (!optionalCategory.isPresent()) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse(false, "category does not exists"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<ApiResponse>(new ApiResponse(false, "category is invalid"), HttpStatus.CONFLICT);
         }
-        productService.updateProduct(productDto, productId);
-        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "product has been updated"), HttpStatus.OK);
+        Category category = optionalCategory.get();
+        productService.addProduct(productDto, category);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "Product has been added"), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/update/{productID}")
+    public ResponseEntity<ApiResponse> updateProduct(@PathVariable("productID") Integer productID, @RequestBody @Valid ProductDto productDto) {
+        Optional<Category> optionalCategory = categoryService.readCategory(productDto.getCategoryId());
+        if (!optionalCategory.isPresent()) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse(false, "category is invalid"), HttpStatus.CONFLICT);
+        }
+        Category category = optionalCategory.get();
+        productService.updateProduct(productID, productDto, category);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "Product has been updated"), HttpStatus.OK);
     }
 }

@@ -1,25 +1,24 @@
 package com.coursework.ecommerce.model;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "user_role")
-@IdClass(UserId.class)
 public class UserRole {
     @Id
-    @Column(name = "user_id")
-    private Integer userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "role_name")
     private String roleName;
 
-    public Integer getUser() {
-        return userId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setUser(Integer userId) {
-        this.userId = userId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getRoleName() {
@@ -30,8 +29,8 @@ public class UserRole {
         this.roleName = roleName;
     }
 
-    public UserRole(Integer userId, String roleName) {
-        this.userId = userId;
+    public UserRole(Integer id, String roleName) {
+        this.id = id;
         this.roleName = roleName;
     }
 

@@ -1,11 +1,10 @@
 package com.coursework.ecommerce.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -19,6 +18,11 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user",
+            fetch = FetchType.LAZY)
+    private List<Order> orders;
 
     public Integer getId() {
         return id;
@@ -36,12 +40,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPasswoprd() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPasswoprd(String passwoprd) {
-        this.password = passwoprd;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public User(String email, String password) {
@@ -50,5 +54,13 @@ public class User {
     }
 
     public User() {
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }

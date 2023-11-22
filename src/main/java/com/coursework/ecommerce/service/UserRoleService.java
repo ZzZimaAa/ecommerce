@@ -11,10 +11,10 @@ public class UserRoleService {
     @Autowired
     UserRoleRepository userRoleRepository;
 
-    public void createUserRole (User user) {
+    public void createUserRole (Integer id, String roleName) {
         UserRole userRole = new UserRole();
-        userRole.setUser(user.getId());
-        userRole.setRoleName("user");
+        userRole.setId(id);
+        userRole.setRoleName(roleName);
         userRoleRepository.save(userRole);
     }
 }

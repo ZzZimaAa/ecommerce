@@ -1,20 +1,16 @@
 package com.coursework.ecommerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.coursework.ecommerce.dto.ProductDto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -24,13 +20,51 @@ public class Product {
     private @NotNull double price;
     private @NotNull String description;
 
-
-    // Many-to-one relationship
-    @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
     Category category;
 
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    private List<WishList> wishListList;
+
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    private List<Cart> carts;
+
+
+
+
+
+    public Product(ProductDto productDto, Category category) {
+        this.name = productDto.getName();
+        this.imageURL = productDto.getImageURL();
+        this.description = productDto.getDescription();
+        this.price = productDto.getPrice();
+        this.category = category;
+    }
+
+    public Product(String name, String imageURL, double price, String description, Category category) {
+        super();
+        this.name = name;
+        this.imageURL = imageURL;
+        this.price = price;
+        this.description = description;
+        this.category = category;
+    }
+
+    public Product() {
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -72,11 +106,14 @@ public class Product {
         this.category = category;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", imageURL='" + imageURL + '\'' +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

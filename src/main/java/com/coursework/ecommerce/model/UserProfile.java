@@ -1,19 +1,14 @@
 package com.coursework.ecommerce.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "user_profile")
-@IdClass(UserId.class)
 public class UserProfile {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer userId;
+    private Integer id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -21,12 +16,20 @@ public class UserProfile {
     @Column(name = "last_name")
     private String lastName;
 
-    public Integer getUser() {
-        return userId;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private UserRole role;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setUser(Integer userId) {
-        this.userId = userId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -45,10 +48,28 @@ public class UserProfile {
         this.lastName = lastName;
     }
 
-    public UserProfile(Integer userId, String firstName, String lastName) {
-        this.userId = userId;
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public UserRole getUserRole() {
+        return role;
+    }
+
+    public void setUserRole(UserRole role) {
+        this.role = role;
+    }
+
+    public UserProfile(Integer id, String firstName, String lastName, UserRole role, User user) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.user = user;
+        this.role = role;
     }
 
     public UserProfile() {
