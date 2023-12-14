@@ -30,7 +30,7 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String query) {
         List<ProductDto> searchResults = productService.searchProducts(query);
-        return new ResponseEntity<>(searchResults, HttpStatus.OK);
+        return new ResponseEntity<List<ProductDto>>(searchResults, HttpStatus.OK);
     }
 
     @PostMapping("/add")

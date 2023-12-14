@@ -61,10 +61,19 @@ public class ProductService {
         // Используйте метод findByNameContaining из ProductRepository для поиска по названию продукта
         List<Product> searchResults = productRepository.findByNameContaining(query);
 
+
+        List<ProductDto> searchResultsDtos = new ArrayList<>();
+        for(Product product : searchResults) {
+            ProductDto productDto = getDtoFromProduct(product);
+            searchResultsDtos.add(productDto);
+        }
+        return searchResultsDtos;
+
+
         // Преобразуйте найденные продукты в DTO
-        return searchResults.stream()
-                .map(ProductService::getDtoFromProduct)
-                .collect(Collectors.toList());
+        //return searchResults.stream()
+                //.map(ProductService::getDtoFromProduct)
+                //.collect(Collectors.toList());
     }
 
 
